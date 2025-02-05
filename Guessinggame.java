@@ -65,7 +65,7 @@ public class Guessinggame {
             case 2:
                 maxNumber = 100;
                 remainingAttempts = 10;
-                points = 1500;
+                points = 1000;
                 break;
 
             case 3:
@@ -80,14 +80,23 @@ public class Guessinggame {
         this.randomNumber = random.nextInt(maxNumber) + 1;
 
         System.out.println("\nTry to guess a number between 1 and " + maxNumber + ".");
+        System.out.println("You can ask for hints by typing 'hint' during the game.");
+        System.out.println("Each hint costs 50 points or 1 attempt.");
 
         while (remainingAttempts > 0) {
             System.out.println("\nRemaining attempts: " + remainingAttempts);
             System.out.println("Current points: " + points);
-            System.out.println("Type a number: ");
+            System.out.print("Type a number or 'hint' for a hint: ");
+            String input = scanner.next();
+
+            if (input.equalsIgnoreCase("hint")) {
+                giveHint();
+                continue;
+            }
+
             int attempt;
             try {
-                attempt = scanner.nextInt();
+                attempt = Integer.parseInt(input);
 
                 if (attempt < 1 || attempt > maxNumber) {
                     System.out.println("Type a number between 1 and " + maxNumber + ".");
@@ -95,8 +104,7 @@ public class Guessinggame {
                 }
 
             } catch (InputMismatchException e) {
-                System.out.println("Invalid input, type a int number");
-                scanner.next();
+                System.out.println("Invalid input, type a int number or 'hint'.");
                 continue;
             }
 
@@ -118,7 +126,7 @@ public class Guessinggame {
 
         if (remainingAttempts == 0) {
             System.out.println("\n You lose! the number was: " + randomNumber);
-            System.out.println("Your points: 0");
+            System.out.println("Your final points: 0");
             pointsLog();
             showHistory();
 
@@ -129,6 +137,56 @@ public class Guessinggame {
 
        
         scanner.close();
+    }
+
+
+    private void giveHint() {
+        System.out.println("\nChoose a hint:");
+        System.out.println("1 - Is the number even or odd? (Cost: 50 points)");
+        System.out.println("2 - Is the number prime? (Cost> 50 points)");
+        System.out.println("3 - Is the number a multiple of 5? (Cost: 50 points)");
+        System.out.println("Type the number of the hint: ");
+
+
+
+        int hintChoice;
+        try {
+            hintChoice = scanner.nextInt();
+            if (hintChoice < 1 || hintChoice > 3) {
+                System.out.println("Invalid choice, no hint will be given.");
+                return;
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. no hint will be given.");
+            scanner.next();
+            return;
+        }
+
+        if (points >= 50) {
+            points -= 50;
+            switch (hintChoice) {
+                case 1:
+                    System.out.println("The number is " + (randomNumber % 2 == 0 ? "even." : "odd."));
+                    break;
+                case 2:
+                    System.out.println("The number is " + (isPrime(randomNumber) ? "prime." : "not prime."));
+                    break;
+                case 3:
+                    System.out.println("The number is " + (randomNumber % 5 == 0 ? "a multiple of 5." : "not a multiple of 5."));
+                    break;
+            }
+        } else {
+            System.out.println("Not enough points for a hint.");
+        }
+    }
+
+
+    private boolean isPrime(int number) {
+        if (number < 2) return false;
+        for (int i = 2; i <= Math.sqrt(number); i++) {
+            if (number % i == 0) return false;
+        }
+        return true;
     }
 
     private void pointsLog() {
@@ -150,7 +208,7 @@ public class Guessinggame {
         try {
             File file = new File(history_file);
             if (!file.exists()) {
-                System.out.println("Points not registred");
+                System.out.println("Points not registered yet");
                 return;
             }
 
